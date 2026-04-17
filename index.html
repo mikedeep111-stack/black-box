@@ -3,61 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Premium Cinema | عالم الأفلام</title>
+    <title>PREMIUM CINEMA | نظام البحث العالمي</title>
     <style>
-        body { background: #0a0b10; color: white; font-family: sans-serif; margin: 0; padding: 20px; text-align: center; }
-        .search-bar { margin-bottom: 30px; }
-        input { padding: 12px; width: 60%; border-radius: 5px; border: none; }
-        button { padding: 12px 20px; background: #e50914; color: white; border: none; cursor: pointer; border-radius: 5px; font-weight: bold; }
-        #movies-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; }
-        .movie-card { background: #1a1c24; border-radius: 10px; overflow: hidden; cursor: pointer; transition: 0.3s; }
-        .movie-card:hover { transform: scale(1.05); }
-        .movie-card img { width: 100%; height: 270px; object-fit: cover; }
-        .movie-info { padding: 10px; font-size: 14px; }
+        :root { --main-color: #e50914; --bg-color: #0a0b10; --card-bg: #1a1c24; }
+        body { background: var(--bg-color); color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
+        .header { padding: 20px; background: rgba(0,0,0,0.8); position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+        .logo { color: var(--main-color); font-size: 28px; font-weight: bold; margin-bottom: 15px; }
+        .search-box { display: flex; justify-content: center; gap: 10px; max-width: 800px; margin: 0 auto; }
+        input { flex: 1; padding: 15px; border-radius: 5px; border: none; background: #222; color: white; font-size: 16px; }
+        button { padding: 15px 30px; background: var(--main-color); color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .container { padding: 20px; }
+        #movies-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; }
+        .movie-card { background: var(--card-bg); border-radius: 8px; overflow: hidden; transition: 0.3s; cursor: pointer; position: relative; }
+        .movie-card:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(229, 9, 20, 0.3); }
+        .movie-card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
+        .movie-info { padding: 10px; text-align: center; }
+        .movie-info h3 { margin: 5px 0; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .year { color: #888; font-size: 12px; }
     </style>
 </head>
 <body>
-    <h1 style="color: #e50914;">PREMIUM CINEMA</h1>
-    <div class="search-bar">
-        <input type="text" id="searchInput" placeholder="ابحث عن أي فيلم في العالم...">
-        <button onclick="searchMovies()">بحث</button>
+
+<div class="header">
+    <div class="logo">PREMIUM CINEMA</div>
+    <div class="search-box">
+        <input type="text" id="searchInput" placeholder="اكتب اسم أي فيلم هنا (مثال: Joker)...">
+        <button id="searchBtn">بحث الآن</button>
     </div>
+</div>
+
+<div class="container">
+    <h2 id="title-text">أفلام مقترحة لكم</h2>
     <div id="movies-grid"></div>
+</div>
 
-    <script>
-        const API_KEY = '15d12028d091151270b790a61821869e';
+<script>
+    const API_KEY = '15d12028d091151270b790a61821869e';
+    const grid = document.getElementById('movies-grid');
+    const input = document.getElementById('searchInput');
+    const btn = document.getElementById('searchBtn');
 
-        async function searchMovies() {
-            const query = document.getElementById('searchInput').value;
-            const url = `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${query}&language=ar-SA`;
+    // دالة جلب البيانات
+    async function fetchMovies(url) {
+        grid.innerHTML = '<p style="grid-column: 1/-1;">جاري البحث عن الأفلام...</p>';
+        try {
             const res = await fetch(url);
             const data = await res.json();
-            displayMovies(data.results);
+            if (data.results && data.results.length > 0) {
+                renderMovies(data.results);
+            } else {
+                grid.innerHTML = '<p style="grid-column: 1/-1;">لم نجد أي نتائج، جرب اسم آخر!</p>';
+            }
+        } catch (err) {
+            grid.innerHTML = '<p style="grid-column: 1/-1;">خطأ في الاتصال، حاول مرة أخرى.</p>';
         }
+    }
 
-        function displayMovies(movies) {
-            const container = document.getElementById('movies-grid');
-            container.innerHTML = movies.map(movie => `
-                <div class="movie-card" onclick="playMovie('${movie.id}')">
-                    <img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" alt="${movie.title}" onerror="this.src='https://via.placeholder.com/500x750?text=No+Poster'">
-                    <div class="movie-info">
-                        <h3>${movie.title}</h3>
-                        <p>${movie.release_date ? movie.release_date.split('-')[0] : ''}</p>
-                    </div>
+    // دالة الرسم في الصفحة
+    function renderMovies(movies) {
+        grid.innerHTML = movies.map(m => `
+            <div class="movie-card" onclick="watchMovie('${m.id}')">
+                <img src="${m.poster_path ? 'https://image.tmdb.org/t/p/w500'+m.poster_path : 'https://via.placeholder.com/500x750?text=No+Poster'}" alt="${m.title}">
+                <div class="movie-info">
+                    <h3>${m.title}</h3>
+                    <div class="year">${m.release_date ? m.release_date.split('-')[0] : 'N/A'}</div>
                 </div>
-            `).join('');
-        }
+            </div>
+        `).join('');
+    }
 
-        function playMovie(id) {
-            window.open(`https://vidsrc.me/embed/movie?tmdb=${id}`, '_blank');
-        }
+    // دالة المشاهدة
+    function watchMovie(id) {
+        window.open(`https://vidsrc.me/embed/movie?tmdb=${id}`, '_blank');
+    }
 
-        // جلب أفلام مقترحة عند فتح الموقع
-        window.onload = async () => {
-            const res = await fetch(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&language=ar-SA`);
-            const data = await res.json();
-            displayMovies(data.results);
-        };
-    </script>
+    // تنفيذ البحث عند الضغط على الزر
+    btn.onclick = () => {
+        const query = input.value.trim();
+        if (query) {
+            document.getElementById('title-text').innerText = `نتائج البحث عن: ${query}`;
+            fetchMovies(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${query}&language=ar-SA`);
+        }
+    };
+
+    // تنفيذ البحث عند ضغط Enter
+    input.onkeypress = (e) => { if(e.key === 'Enter') btn.click(); };
+
+    // تحميل أفلام مقترحة عند فتح الموقع
+    window.onload = () => {
+        fetchMovies(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&language=ar-SA`);
+    };
+</script>
+
 </body>
 </html>
