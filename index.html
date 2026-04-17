@@ -3,147 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TYRELL EXCLUSIVE | الواجهة النخبوية</title>
+    <title>CINE RED | عالم السينما</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary: #ff0000;
-            --bg: #020202;
-            --glass: rgba(255, 255, 255, 0.05);
-            --border: rgba(255, 255, 255, 0.1);
-        }
-        body {
-            background: var(--bg);
-            color: #fff;
-            font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-image: radial-gradient(circle at top right, #1a0000, transparent);
-            min-height: 100vh;
-        }
-        header {
-            padding: 40px 20px;
-            text-align: center;
-            background: linear-gradient(to bottom, #000, transparent);
-        }
-        .logo {
-            font-size: 3rem;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 8px;
-            background: linear-gradient(45deg, #fff, #ff0000);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin: 0;
-        }
-        .tagline { color: #666; font-size: 0.9rem; margin-top: 10px; letter-spacing: 2px; }
-        
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-        
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 25px;
-        }
-        
-        .card {
-            position: relative;
-            background: var(--glass);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--border);
-            border-radius: 15px;
-            padding: 10px;
-            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            overflow: hidden;
-        }
-        
-        .card:hover {
-            transform: translateY(-15px) scale(1.02);
-            border-color: var(--primary);
-            box-shadow: 0 20px 40px rgba(255, 0, 0, 0.2);
-        }
-        
-        .card img {
-            width: 100%;
-            height: 320px;
-            object-fit: cover;
-            border-radius: 10px;
-            margin-bottom: 10px;
-        }
-        
-        .card h3 {
-            font-size: 1.1rem;
-            margin: 10px 0 5px 0;
-            font-weight: 600;
-        }
-        
-        .card p { color: #888; font-size: 0.8rem; margin: 0 0 15px 0; }
-        
-        .btn {
-            display: block;
-            background: #fff;
-            color: #000;
-            text-decoration: none;
-            padding: 12px;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 0.9rem;
-            transition: 0.3s;
-            text-align: center;
-        }
-        
-        .card:hover .btn {
-            background: var(--primary);
-            color: #fff;
-        }
-
-        .premium-badge {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: var(--primary);
-            color: #fff;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 900;
-            z-index: 2;
-        }
+        body { font-family: 'Cairo', sans-serif; background-color: #020202; color: white; overflow-x: hidden; }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .hero-gradient { background: linear-gradient(to top, #020202 10%, rgba(2, 2, 2, 0.8) 50%, transparent 100%); }
     </style>
 </head>
 <body>
 
-<header>
-    <h1 class="logo">Tyrell</h1>
-    <div class="tagline">PREMIUM_CONTENT_DISTRIBUTION_SYSTEM</div>
-</header>
+    <div id="hero-bg" class="fixed inset-0 z-0 opacity-30 transition-opacity duration-1000 bg-cover bg-center"></div>
+    <div class="fixed inset-0 z-0 hero-gradient"></div>
 
-<div class="container">
-    <div class="grid">
-        <div class="card">
-            <span class="premium-badge">4K HDR</span>
-            <img src="https://m.media-amazon.com/images/M/MV5BNGEyOGJiN2UtMTgwMi00ODQ4LThjM2UtYWZlZTEyZGU4MWVlXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg" alt="Mickey 17">
-            <h3>Mickey 17</h3>
-            <p>2025 • Sci-Fi • Robert Pattinson</p>
-            <a href="https://vidsrc.me/embed/movie?imdb=tt2222042" target="_blank" class="btn">WATCH NOW</a>
+    <nav class="relative z-50 flex items-center justify-between px-8 py-6">
+        <div class="flex items-center gap-2">
+            <div class="w-10 h-10 bg-red-600 rounded-lg flex items-center justify-center shadow-lg shadow-red-600/50">
+                <span class="font-black">R</span>
+            </div>
+            <span class="text-2xl font-black italic tracking-tighter uppercase">CINE<span class="text-red-600">RED</span></span>
+        </div>
+    </nav>
+
+    <main class="relative z-10 px-8 pt-12">
+        <div id="main-content" class="max-w-4xl opacity-0 transition-all duration-700 transform translate-x-10">
+            <div class="flex items-center gap-2 text-red-600 mb-4 font-bold tracking-widest text-xs uppercase">
+                🔥 الأكثر شهرة هذا الأسبوع
+            </div>
+            <h1 id="movie-title" class="text-6xl md:text-8xl font-black mb-6 leading-none uppercase"></h1>
+            <p id="movie-desc" class="text-lg opacity-60 max-w-2xl mb-10 line-clamp-3 leading-relaxed"></p>
+            
+            <button onclick="openPlayer()" class="bg-red-600 hover:bg-red-700 text-white px-10 py-5 rounded-full font-black flex items-center gap-3 transition-transform hover:scale-110 shadow-2xl">
+                ▶ شاهد الآن
+            </button>
         </div>
 
-        <div class="card">
-            <span class="premium-badge">NEW</span>
-            <img src="https://m.media-amazon.com/images/M/MV5BMDdmMTBiNTYtMDIzNi00NGVlLWIzMDYtZTk3MTQ3NGQxZGEwXkEyXkFqcGdeQXVyMzMwOTU5MDk@._V1_.jpg" alt="The Batman">
-            <h3>The Batman II</h3>
-            <p>2026 • Action • Matt Reeves</p>
-            <a href="https://vidsrc.me/embed/movie?imdb=tt11353000" target="_blank" class="btn">WATCH NOW</a>
-        </div>
+        <section class="mt-32">
+            <h2 class="text-xl font-black mb-8 text-white/40 uppercase tracking-widest">المقترح لك الليلة</h2>
+            <div id="movie-list" class="flex gap-6 overflow-x-auto pb-10 no-scrollbar">
+                </div>
+        </section>
+    </main>
 
-        <div class="card">
-            <span class="premium-badge">TRENDING</span>
-            <img src="https://m.media-amazon.com/images/M/MV5BNmY2N2I0N2ItYjE5Mi00MjVjLTllODEtMmQyYTMzNDExYzE2XkEyXkFqcGc@._V1_.jpg" alt="Gladiator 2">
-            <h3>Gladiator II</h3>
-            <p>2024 • Epic • Ridley Scott</p>
-            <a href="https://vidsrc.me/embed/movie?imdb=tt9218128" target="_blank" class="btn">WATCH NOW</a>
+    <div id="player-modal" class="fixed inset-0 z-[100] bg-black hidden items-center justify-center p-4">
+        <button onclick="closePlayer()" class="absolute top-8 left-8 text-white hover:text-red-600 transition-colors text-4xl font-bold">×</button>
+        <div class="w-full h-full max-w-6xl aspect-video rounded-3xl overflow-hidden shadow-2xl border border-white/10">
+            <iframe id="video-frame" src="" class="w-full h-full" allowfullscreen></iframe>
         </div>
     </div>
-</div>
 
+    <script>
+        const API_KEY = '840134f728c3a9d9e68e0e7a1262d495';
+        const imgPath = 'https://image.tmdb.org/t/p/original';
+        let currentMovieId = '';
+
+        async function init() {
+            const res = await fetch(`https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}&language=ar-SA`);
+            const data = await res.json();
+            const movies = data.results.slice(0, 10);
+            
+            renderMovies(movies);
+            selectMovie(movies[0]);
+        }
+
+        function renderMovies(movies) {
+            const list = document.getElementById('movie-list');
+            list.innerHTML = movies.map(m => `
+                <div onclick='selectMovie(${JSON.stringify(m).replace(/'/g, "&apos;")})' 
+                     class="flex-none w-48 aspect-[2/3] rounded-2xl overflow-hidden cursor-pointer border-2 border-transparent hover:border-red-600 transition-all opacity-60 hover:opacity-100 shadow-xl">
+                    <img src="${imgPath + m.poster_path}" class="w-full h-full object-cover">
+                </div>
+            `).join('');
+        }
+
+        function selectMovie(m) {
+            currentMovieId = m.id;
+            document.getElementById('hero-bg').style.backgroundImage = `url('${imgPath + m.backdrop_path}')`;
+            document.getElementById('movie-title').innerText = m.title;
+            document.getElementById('movie-desc').innerText = m.overview;
+            
+            const content = document.getElementById('main-content');
+            content.classList.remove('opacity-0', 'translate-x-10');
+            content.classList.add('opacity-100', 'translate-x-0');
+        }
+
+        function openPlayer() {
+            document.getElementById('video-frame').src = `https://vidsrc.me/embed/movie?tmdb=${currentMovieId}`;
+            document.getElementById('player-modal').classList.remove('hidden');
+            document.getElementById('player-modal').classList.add('flex');
+        }
+
+        function closePlayer() {
+            document.getElementById('player-modal').classList.add('hidden');
+            document.getElementById('video-frame').src = '';
+        }
+
+        init();
+    </script>
 </body>
 </html>
