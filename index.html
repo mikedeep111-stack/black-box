@@ -1,4 +1,149 @@
-<body style="background:red; color:white; font-size:50px; text-align:center;">
-    <h1>SYSTEM IS ONLINE - TYRELL</h1>
-    <img src="https://image.tmdb.org/t/p/w500/lr9YpYv86mK65U398T477vclv1m.jpg" width="300">
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TYRELL EXCLUSIVE | الواجهة النخبوية</title>
+    <style>
+        :root {
+            --primary: #ff0000;
+            --bg: #020202;
+            --glass: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+        body {
+            background: var(--bg);
+            color: #fff;
+            font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: radial-gradient(circle at top right, #1a0000, transparent);
+            min-height: 100vh;
+        }
+        header {
+            padding: 40px 20px;
+            text-align: center;
+            background: linear-gradient(to bottom, #000, transparent);
+        }
+        .logo {
+            font-size: 3rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 8px;
+            background: linear-gradient(45deg, #fff, #ff0000);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0;
+        }
+        .tagline { color: #666; font-size: 0.9rem; margin-top: 10px; letter-spacing: 2px; }
+        
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 25px;
+        }
+        
+        .card {
+            position: relative;
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 10px;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+        }
+        
+        .card:hover {
+            transform: translateY(-15px) scale(1.02);
+            border-color: var(--primary);
+            box-shadow: 0 20px 40px rgba(255, 0, 0, 0.2);
+        }
+        
+        .card img {
+            width: 100%;
+            height: 320px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .card h3 {
+            font-size: 1.1rem;
+            margin: 10px 0 5px 0;
+            font-weight: 600;
+        }
+        
+        .card p { color: #888; font-size: 0.8rem; margin: 0 0 15px 0; }
+        
+        .btn {
+            display: block;
+            background: #fff;
+            color: #000;
+            text-decoration: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            transition: 0.3s;
+            text-align: center;
+        }
+        
+        .card:hover .btn {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .premium-badge {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: var(--primary);
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 900;
+            z-index: 2;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1 class="logo">Tyrell</h1>
+    <div class="tagline">PREMIUM_CONTENT_DISTRIBUTION_SYSTEM</div>
+</header>
+
+<div class="container">
+    <div class="grid">
+        <div class="card">
+            <span class="premium-badge">4K HDR</span>
+            <img src="https://m.media-amazon.com/images/M/MV5BNGEyOGJiN2UtMTgwMi00ODQ4LThjM2UtYWZlZTEyZGU4MWVlXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg" alt="Mickey 17">
+            <h3>Mickey 17</h3>
+            <p>2025 • Sci-Fi • Robert Pattinson</p>
+            <a href="https://vidsrc.me/embed/movie?imdb=tt2222042" target="_blank" class="btn">WATCH NOW</a>
+        </div>
+
+        <div class="card">
+            <span class="premium-badge">NEW</span>
+            <img src="https://m.media-amazon.com/images/M/MV5BMDdmMTBiNTYtMDIzNi00NGVlLWIzMDYtZTk3MTQ3NGQxZGEwXkEyXkFqcGdeQXVyMzMwOTU5MDk@._V1_.jpg" alt="The Batman">
+            <h3>The Batman II</h3>
+            <p>2026 • Action • Matt Reeves</p>
+            <a href="https://vidsrc.me/embed/movie?imdb=tt11353000" target="_blank" class="btn">WATCH NOW</a>
+        </div>
+
+        <div class="card">
+            <span class="premium-badge">TRENDING</span>
+            <img src="https://m.media-amazon.com/images/M/MV5BNmY2N2I0N2ItYjE5Mi00MjVjLTllODEtMmQyYTMzNDExYzE2XkEyXkFqcGc@._V1_.jpg" alt="Gladiator 2">
+            <h3>Gladiator II</h3>
+            <p>2024 • Epic • Ridley Scott</p>
+            <a href="https://vidsrc.me/embed/movie?imdb=tt9218128" target="_blank" class="btn">WATCH NOW</a>
+        </div>
+    </div>
+</div>
+
 </body>
+</html>
