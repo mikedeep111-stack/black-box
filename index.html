@@ -2,80 +2,72 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PREMIUM CINEMA | Global Search</title>
+    <title>PREMIUM CINEMA | Debug Mode</title>
     <style>
-        :root { --main: #ff0000; --bg: #050505; --card: #121212; }
-        body { background: var(--bg); color: white; font-family: 'Tahoma', sans-serif; margin: 0; padding: 0; }
-        .nav { background: #000; padding: 15px; text-align: center; border-bottom: 2px solid var(--main); }
-        .search-area { padding: 20px; display: flex; justify-content: center; gap: 5px; }
-        input { padding: 15px; width: 70%; border: none; border-radius: 4px; background: #1a1a1a; color: white; border: 1px solid #333; }
-        button { padding: 15px 25px; background: var(--main); color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; padding: 20px; }
-        .card { background: var(--card); border-radius: 8px; overflow: hidden; cursor: pointer; transition: 0.2s; border: 1px solid #222; }
-        .card:hover { border-color: var(--main); transform: translateY(-3px); }
-        .card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; background: #222; }
-        .card h3 { font-size: 13px; margin: 8px; text-align: center; height: 32px; overflow: hidden; }
-        #status { color: #888; text-align: center; font-size: 14px; }
+        body { background: #050505; color: white; font-family: sans-serif; text-align: center; }
+        .search-area { padding: 40px; }
+        input { padding: 15px; width: 60%; border-radius: 5px; border: 1px solid #333; background: #111; color: white; }
+        button { padding: 15px 25px; background: #e50914; color: white; border: none; cursor: pointer; border-radius: 5px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; padding: 20px; }
+        .card { background: #111; border-radius: 8px; overflow: hidden; border: 1px solid #222; cursor: pointer; }
+        .card img { width: 100%; height: 240px; object-fit: cover; }
+        #log { color: #ffcc00; font-size: 12px; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-<div class="nav"><h1 style="margin:0; color:var(--main);">PREMIUM CINEMA</h1></div>
+    <h1 style="color:#e50914">PREMIUM CINEMA</h1>
+    
+    <div class="search-area">
+        <input type="text" id="inp" placeholder="جرب ابحث عن Joker...">
+        <button id="btn">بحث</button>
+        <div id="log">حالة النظام: خامل</div>
+    </div>
 
-<div class="search-area">
-    <input type="text" id="inp" placeholder="اكتب اسم الفيلم بالإنجليزية أو العربية...">
-    <button id="btn">بحث</button>
-</div>
+    <div class="grid" id="grid"></div>
 
-<div id="status">جاري الاتصال بالسيرفر العالمي...</div>
-<div class="grid" id="grid"></div>
+    <script>
+        // قمت بتغيير المفتاح لمفتاح جديد تماماً الآن
+        const API_KEY = '840134f728c3a9d9e68e0e7a1262d495'; 
+        const grid = document.getElementById('grid');
+        const log = document.getElementById('log');
 
-<script>
-    const KEY = '15d12028d091151270b790a61821869e';
-    const grid = document.getElementById('grid');
-    const status = document.getElementById('status');
-
-    async function callSystem(query = "") {
-        status.innerText = "جاري جلب البيانات...";
-        // الرابط يدعم البحث (Search) أو عرض الأفلام الشائعة (Popular) إذا كان البحث فارغاً
-        const url = query 
-            ? `https://api.themoviedb.org/3/search/movie?api_key=${KEY}&query=${encodeURIComponent(query)}&language=ar-SA`
-            : `https://api.themoviedb.org/3/movie/popular?api_key=${KEY}&language=ar-SA`;
-
-        try {
-            const res = await fetch(url);
-            const data = await res.json();
+        async function startSearch(query = "") {
+            log.innerText = "جاري محاولة الاتصال بـ TMDB...";
             
-            if (!data.results || data.results.length === 0) {
-                status.innerText = "لم نجد هذا الفيلم، جرب اسماً آخر بالإنجليزية.";
-                return;
-            }
+            const url = query 
+                ? `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(query)}&language=ar-SA`
+                : `https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&language=ar-SA`;
 
-            status.innerText = query ? `نتائج البحث عن: ${query}` : "أفلام مقترحة لك الآن";
-            grid.innerHTML = data.results.map(m => `
-                <div class="card" onclick="play('${m.id}')">
-                    <img src="${m.poster_path ? 'https://image.tmdb.org/t/p/w500'+m.poster_path : 'https://via.placeholder.com/500x750?text=No+Poster'}" alt="img">
-                    <h3>${m.title}</h3>
+            try {
+                const res = await fetch(url);
+                if (!res.ok) throw new Error(`خطأ من السيرفر: ${res.status}`);
+                
+                const data = await res.json();
+                
+                if (data.results.length === 0) {
+                    log.innerText = "السيرفر استجاب ولكن لا توجد نتائج لهذا الاسم.";
+                } else {
+                    log.innerText = `تم العثور على ${data.results.length} فيلم.`;
+                    render(data.results);
+                }
+            } catch (err) {
+                log.innerText = "فشل الاتصال: " + err.message + " (قد يكون المفتاح محظوراً أو الإنترنت ضعيف)";
+                console.error(err);
+            }
+        }
+
+        function render(movies) {
+            grid.innerHTML = movies.map(m => `
+                <div class="card" onclick="window.open('https://vidsrc.me/embed/movie?tmdb=${m.id}', '_blank')">
+                    <img src="https://image.tmdb.org/t/p/w500${m.poster_path}" onerror="this.src='https://via.placeholder.com/200x300?text=No+Image'">
+                    <p>${m.title}</p>
                 </div>
             `).join('');
-        } catch (e) {
-            status.innerText = "حدث خطأ في الاتصال بالسيرفر، تأكد من الإنترنت.";
-            console.error(e);
         }
-    }
 
-    function play(id) {
-        // فتح المشغل في صفحة جديدة
-        window.open(`https://vidsrc.me/embed/movie?tmdb=${id}`, '_blank');
-    }
-
-    document.getElementById('btn').onclick = () => callSystem(document.getElementById('inp').value);
-    document.getElementById('inp').onkeypress = (e) => { if(e.key === 'Enter') callSystem(document.getElementById('inp').value); };
-
-    // تشغيل أولي عند الفتح
-    callSystem();
-</script>
-
+        document.getElementById('btn').onclick = () => startSearch(document.getElementById('inp').value);
+        window.onload = () => startSearch();
+    </script>
 </body>
 </html>
