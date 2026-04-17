@@ -3,104 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CINE RED | عالم السينما</title>
+    <title>CINE RED</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Cairo', sans-serif; background-color: #020202; color: white; overflow-x: hidden; }
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        body { background-color: #020202; color: white; margin: 0; font-family: sans-serif; }
+        .hero-gradient { background: linear-gradient(to top, #020202 20%, transparent); }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        .hero-gradient { background: linear-gradient(to top, #020202 10%, rgba(2, 2, 2, 0.8) 50%, transparent 100%); }
+        .active-card { border: 2px solid #ef4444; box-shadow: 0 0 20px rgba(239, 68, 68, 0.5); opacity: 1 !important; }
     </style>
 </head>
 <body>
-
-    <div id="hero-bg" class="fixed inset-0 z-0 opacity-30 transition-opacity duration-1000 bg-cover bg-center"></div>
+    <div id="bg" class="fixed inset-0 z-0 bg-cover bg-center opacity-40 transition-all duration-1000"></div>
     <div class="fixed inset-0 z-0 hero-gradient"></div>
 
-    <nav class="relative z-50 flex items-center justify-between px-8 py-6">
+    <nav class="relative z-50 p-6 flex justify-between items-center">
         <div class="flex items-center gap-2">
-            <div class="w-10 h-10 bg-red-600 rounded-lg flex items-center justify-center shadow-lg shadow-red-600/50">
-                <span class="font-black">R</span>
+            <div class="bg-red-600 p-2 rounded shadow-lg shadow-red-600/50">
+                <span class="font-black italic text-xl">R</span>
             </div>
-            <span class="text-2xl font-black italic tracking-tighter uppercase">CINE<span class="text-red-600">RED</span></span>
+            <span class="text-xl font-black italic tracking-tighter uppercase">CINE<span class="text-red-600">RED</span></span>
         </div>
     </nav>
 
-    <main class="relative z-10 px-8 pt-12">
-        <div id="main-content" class="max-w-4xl opacity-0 transition-all duration-700 transform translate-x-10">
-            <div class="flex items-center gap-2 text-red-600 mb-4 font-bold tracking-widest text-xs uppercase">
-                🔥 الأكثر شهرة هذا الأسبوع
-            </div>
-            <h1 id="movie-title" class="text-6xl md:text-8xl font-black mb-6 leading-none uppercase"></h1>
-            <p id="movie-desc" class="text-lg opacity-60 max-w-2xl mb-10 line-clamp-3 leading-relaxed"></p>
-            
-            <button onclick="openPlayer()" class="bg-red-600 hover:bg-red-700 text-white px-10 py-5 rounded-full font-black flex items-center gap-3 transition-transform hover:scale-110 shadow-2xl">
-                ▶ شاهد الآن
-            </button>
+    <main class="relative z-10 px-6 pt-10">
+        <div id="hero-content" class="max-w-xl min-h-[300px]">
+            <h1 id="t" class="text-5xl font-black mb-4 leading-tight uppercase"></h1>
+            <p id="d" class="text-sm opacity-70 mb-8 line-clamp-3 leading-relaxed"></p>
+            <button onclick="playMovie()" class="bg-red-600 px-8 py-4 rounded-full font-black text-sm hover:scale-105 transition-all shadow-xl">▶ شاهد الآن</button>
         </div>
 
-        <section class="mt-32">
-            <h2 class="text-xl font-black mb-8 text-white/40 uppercase tracking-widest">المقترح لك الليلة</h2>
-            <div id="movie-list" class="flex gap-6 overflow-x-auto pb-10 no-scrollbar">
+        <section class="mt-20">
+            <h2 class="text-sm font-bold mb-6 text-gray-500 tracking-widest">المقترح لك الليلة</h2>
+            <div id="list" class="flex gap-4 overflow-x-auto pb-10 no-scrollbar items-center">
                 </div>
         </section>
     </main>
 
-    <div id="player-modal" class="fixed inset-0 z-[100] bg-black hidden items-center justify-center p-4">
-        <button onclick="closePlayer()" class="absolute top-8 left-8 text-white hover:text-red-600 transition-colors text-4xl font-bold">×</button>
-        <div class="w-full h-full max-w-6xl aspect-video rounded-3xl overflow-hidden shadow-2xl border border-white/10">
-            <iframe id="video-frame" src="" class="w-full h-full" allowfullscreen></iframe>
+    <div id="modal" class="fixed inset-0 z-[100] bg-black hidden flex-col">
+        <div class="p-4 flex justify-end">
+            <button onclick="closeP()" class="text-3xl">&times;</button>
         </div>
+        <iframe id="f" class="w-full flex-grow border-0" allowfullscreen></iframe>
     </div>
 
     <script>
-        const API_KEY = '840134f728c3a9d9e68e0e7a1262d495';
-        const imgPath = 'https://image.tmdb.org/t/p/original';
-        let currentMovieId = '';
+        const K = '840134f728c3a9d9e68e0e7a1262d495';
+        const IMG = 'https://image.tmdb.org/t/p/w500';
+        const IMG_HD = 'https://image.tmdb.org/t/p/original';
+        let currentId = '';
 
-        async function init() {
-            const res = await fetch(`https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}&language=ar-SA`);
-            const data = await res.json();
-            const movies = data.results.slice(0, 10);
+        async function start() {
+            try {
+                const res = await fetch(`https://api.themoviedb.org/3/trending/movie/week?api_key=${K}&language=ar-SA`);
+                const data = await res.json();
+                const ms = data.results.slice(0, 10);
+                
+                const list = document.getElementById('list');
+                list.innerHTML = ms.map((m, i) => `
+                    <img src="${IMG}${m.poster_path}" 
+                         id="card-${m.id}"
+                         onclick='updateHero(${JSON.stringify(m).replace(/'/g, "&apos;")})'
+                         class="w-32 rounded-xl cursor-pointer opacity-40 transition-all duration-300">
+                `).join('');
+
+                updateHero(ms[0]);
+            } catch (e) {
+                document.getElementById('t').innerText = "خطأ في الاتصال بالسيرفر";
+            }
+        }
+
+        function updateHero(m) {
+            currentId = m.id;
+            document.getElementById('bg').style.backgroundImage = \`url('\${IMG_HD}\${m.backdrop_path}')\`;
+            document.getElementById('t').innerText = m.title;
+            document.getElementById('d').innerText = m.overview;
             
-            renderMovies(movies);
-            selectMovie(movies[0]);
+            document.querySelectorAll('#list img').forEach(img => img.classList.remove('active-card'));
+            document.getElementById('card-' + m.id).classList.add('active-card');
         }
 
-        function renderMovies(movies) {
-            const list = document.getElementById('movie-list');
-            list.innerHTML = movies.map(m => `
-                <div onclick='selectMovie(${JSON.stringify(m).replace(/'/g, "&apos;")})' 
-                     class="flex-none w-48 aspect-[2/3] rounded-2xl overflow-hidden cursor-pointer border-2 border-transparent hover:border-red-600 transition-all opacity-60 hover:opacity-100 shadow-xl">
-                    <img src="${imgPath + m.poster_path}" class="w-full h-full object-cover">
-                </div>
-            `).join('');
+        function playMovie() {
+            document.getElementById('f').src = \`https://vidsrc.me/embed/movie?tmdb=\${currentId}\`;
+            document.getElementById('modal').classList.replace('hidden', 'flex');
         }
 
-        function selectMovie(m) {
-            currentMovieId = m.id;
-            document.getElementById('hero-bg').style.backgroundImage = `url('${imgPath + m.backdrop_path}')`;
-            document.getElementById('movie-title').innerText = m.title;
-            document.getElementById('movie-desc').innerText = m.overview;
-            
-            const content = document.getElementById('main-content');
-            content.classList.remove('opacity-0', 'translate-x-10');
-            content.classList.add('opacity-100', 'translate-x-0');
+        function closeP() {
+            document.getElementById('modal').classList.replace('flex', 'hidden');
+            document.getElementById('f').src = '';
         }
 
-        function openPlayer() {
-            document.getElementById('video-frame').src = `https://vidsrc.me/embed/movie?tmdb=${currentMovieId}`;
-            document.getElementById('player-modal').classList.remove('hidden');
-            document.getElementById('player-modal').classList.add('flex');
-        }
-
-        function closePlayer() {
-            document.getElementById('player-modal').classList.add('hidden');
-            document.getElementById('video-frame').src = '';
-        }
-
-        init();
+        start();
     </script>
 </body>
 </html>
