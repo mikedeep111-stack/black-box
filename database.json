@@ -1,14 +1,32 @@
 [
   {
-    "title": "Ballistic",
+    "title": "Mickey 17",
     "year": "2025",
-    "image": "https://image.tmdb.org/t/p/w500/uS9uS6nwrv7pZRy4vNzJuRviJ0I.jpg",
-    "url": "رابط_الأفلييت_الخاص_بك"
+    "image": "https://image.tmdb.org/t/p/w500/lr9YpYv86mK65U398T477vclv1m.jpg",
+    "url": "https://www.google.com"
   },
   {
-    "title": "The Whistler",
+    "title": "Superman",
+    "year": "2025",
+    "image": "https://image.tmdb.org/t/p/w500/57X9Hl3kC1p7U60E21v1GkO6E0k.jpg",
+    "url": "https://www.google.com"
+  },
+  {
+    "title": "The Batman Part II",
     "year": "2026",
-    "image": "https://image.tmdb.org/t/p/w500/v9J9VOT9pS90mTf9mK9WInV7W8y.jpg",
-    "url": "رابط_الأفلييت_الخاص_بك"
+    "image": "https://image.tmdb.org/t/p/w500/y6vFhT4lG39Y9oZ7lK6Y7U6n1M8.jpg",
+    "url": "https://www.google.com"
+  },
+  {
+    "title": "Avatar 3",
+    "year": "2025",
+    "image": "https://image.tmdb.org/t/p/w500/96fFvS6o7Z6Y6Z6n1M8v6n7Z6n1.jpg",
+    "url": "https://www.google.com"
+  },
+  {
+    "title": "Avengers: Doomsday",
+    "year": "2026",
+    "image": "https://image.tmdb.org/t/p/w500/7V9VOT9pS90mTf9mK9WInV7W8y.jpg",
+    "url": "https://www.google.com"
   }
 ]
