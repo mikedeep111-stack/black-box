@@ -3,79 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CINE RED | SEARCH MODE</title>
+    <title>CINE RED | Stream</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;900&display=swap');
-        body { background: #050505; color: white; font-family: 'Cairo', sans-serif; overflow-x: hidden; }
-        .glass { background: rgba(255,255,255,0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.05); }
-        .search-input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); transition: all 0.3s; }
-        .search-input:focus { background: rgba(220,38,38,0.05); border-color: #dc2626; outline: none; box-shadow: 0 0 20px rgba(220,38,38,0.2); }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Noto+Sans+Arabic:wght@400;700;900&display=swap');
+        body { background: #000; color: #fff; font-family: 'Noto Sans Arabic', sans-serif; margin: 0; overflow-x: hidden; }
+        .hero-gradient { background: linear-gradient(0deg, #000 10%, rgba(0,0,0,0.6) 50%, transparent 100%); }
+        .card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .card:hover { transform: scale(1.05); z-index: 10; border: 2px solid #e11d48; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .glass { background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(15px); }
     </style>
 </head>
-<body class="p-6">
+<body>
 
-    <nav class="flex justify-between items-center mb-12">
-        <div class="flex items-center gap-2">
-            <div class="bg-red-600 w-8 h-8 rounded flex items-center justify-center shadow-lg shadow-red-600/50">
-                <span class="font-black italic text-sm">R</span>
-            </div>
-            <span class="text-xl font-black italic tracking-tighter uppercase">CINE<span class="text-red-600">RED</span></span>
-        </div>
-        <div class="text-xs font-mono text-red-600 animate-pulse">SYSTEM_STATUS: ACTIVE</div>
-    </nav>
-
-    <div class="max-w-4xl mx-auto text-center mb-16">
-        <h1 class="text-4xl font-black mb-8 uppercase tracking-tighter">ماذا تريد أن تشاهد يا إليوت؟</h1>
-        <div class="relative max-w-2xl mx-auto">
-            <input type="text" id="query" oninput="search()" placeholder="اكتب اسم الفيلم أو المسلسل هنا..." 
-                   class="search-input w-full p-5 rounded-2xl text-xl text-center">
+    <div id="hero" class="relative h-[70vh] w-full flex items-end p-8 bg-cover bg-center transition-all duration-1000">
+        <div class="absolute inset-0 hero-gradient"></div>
+        <div class="relative z-10 max-w-2xl">
+            <h1 id="hero-title" class="text-4xl md:text-6xl font-black mb-4 uppercase tracking-tighter"></h1>
+            <p id="hero-desc" class="text-sm md:text-base text-gray-300 line-clamp-3 mb-6"></p>
+            <button id="hero-play" class="bg-white text-black px-8 py-3 rounded font-bold hover:bg-red-600 hover:text-white transition-colors">▶ تشغيل الآن</button>
         </div>
     </div>
 
-    <div id="results" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+    <main class="relative z-20 -mt-20 px-4 md:px-8">
+        
+        <div class="mb-12 max-w-md mx-auto">
+            <input type="text" id="search" oninput="doSearch()" placeholder="ابحث عن الأفلام أو المسلسلات..." 
+                   class="w-full bg-zinc-900/80 border border-white/10 p-4 rounded-lg text-center outline-none focus:border-red-600 transition-all">
         </div>
 
-    <div id="player" class="fixed inset-0 z-[100] bg-black hidden flex-col items-center justify-center p-4">
-        <button onclick="closePlayer()" class="absolute top-6 left-6 text-4xl hover:text-red-600">&times;</button>
-        <div class="w-full max-w-5xl aspect-video rounded-3xl overflow-hidden shadow-2xl border border-white/5 bg-zinc-900">
-            <iframe id="iframe" class="w-full h-full" allowfullscreen></iframe>
+        <section id="trending-sec">
+            <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
+                <span class="w-2 h-6 bg-red-600"></span> الشائع الآن
+            </h2>
+            <div id="results" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-4">
+                </div>
+        </section>
+    </main>
+
+    <div id="player-modal" class="fixed inset-0 z-[100] bg-black hidden flex-col">
+        <div class="glass p-4 flex justify-between items-center border-b border-white/10">
+            <span id="playing-title" class="font-bold text-red-500"></span>
+            <button onclick="closePlayer()" class="text-3xl">&times;</button>
         </div>
+        <iframe id="video-frame" class="w-full h-full border-0" allowfullscreen></iframe>
     </div>
 
     <script>
-        const KEY = '840134f728c3a9d9e68e0e7a1262d495';
-        const IMG = 'https://image.tmdb.org/t/p/w500';
+        const API_KEY = '840134f728c3a9d9e68e0e7a1262d495';
+        const BASE_IMG = 'https://image.tmdb.org/t/p/original';
+        const POSTER_IMG = 'https://image.tmdb.org/t/p/w500';
 
-        async function search() {
-            const q = document.getElementById('query').value;
-            if(q.length < 2) return;
-
-            const r = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${KEY}&query=${q}&language=ar-SA`);
+        async function init() {
+            const r = await fetch(`https://api.themoviedb.org/3/trending/all/week?api_key=${API_KEY}&language=ar-SA`);
             const d = await r.json();
-            
-            document.getElementById('results').innerHTML = d.results.map(m => `
-                <div onclick="play('${m.id}', '${m.media_type}')" class="group cursor-pointer">
-                    <div class="aspect-[2/3] rounded-xl overflow-hidden border border-white/5 group-hover:border-red-600 transition-all shadow-xl mb-3">
-                        <img src="${m.poster_path ? IMG+m.poster_path : 'https://via.placeholder.com/500x750?text=No+Poster'}" class="w-full h-full object-cover">
+            render(d.results);
+            setHero(d.results[0]);
+        }
+
+        function setHero(m) {
+            document.getElementById('hero').style.backgroundImage = `url('${BASE_IMG + m.backdrop_path}')`;
+            document.getElementById('hero-title').innerText = m.title || m.name;
+            document.getElementById('hero-desc').innerText = m.overview;
+            document.getElementById('hero-play').onclick = () => play(m.id, m.media_type, m.title || m.name);
+        }
+
+        function render(data) {
+            const container = document.getElementById('results');
+            container.innerHTML = data.map(m => `
+                <div onclick="play('${m.id}', '${m.media_type}', '${(m.title || m.name).replace(/'/g, "")}')" 
+                     class="card group cursor-pointer bg-zinc-900 rounded-md overflow-hidden relative">
+                    <img src="${m.poster_path ? POSTER_IMG+m.poster_path : ''}" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                        <span class="text-white font-bold">▶ شاهد</span>
                     </div>
-                    <h3 class="text-sm font-bold truncate">${m.title || m.name}</h3>
-                    <p class="text-xs text-gray-500">${m.release_date ? m.release_date.split('-')[0] : (m.media_type == 'tv' ? 'مسلسل' : '')}</p>
                 </div>
             `).join('');
         }
 
-        function play(id, type) {
-            const embedType = type === 'tv' ? 'tv' : 'movie';
-            document.getElementById('iframe').src = `https://vidsrc.me/embed/${embedType}?tmdb=${id}`;
-            document.getElementById('player').classList.remove('hidden');
-            document.getElementById('player').classList.add('flex');
+        async function doSearch() {
+            const q = document.getElementById('search').value;
+            if(q.length < 2) { init(); return; }
+            const r = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${q}&language=ar-SA`);
+            const d = await r.json();
+            render(d.results);
+        }
+
+        function play(id, type, name) {
+            const t = type === 'tv' ? 'tv' : 'movie';
+            document.getElementById('video-frame').src = `https://vidsrc.me/embed/${t}?tmdb=${id}`;
+            document.getElementById('playing-title').innerText = name;
+            document.getElementById('player-modal').classList.replace('hidden', 'flex');
         }
 
         function closePlayer() {
-            document.getElementById('player').classList.replace('flex', 'hidden');
-            document.getElementById('iframe').src = '';
+            document.getElementById('player-modal').classList.replace('flex', 'hidden');
+            document.getElementById('video-frame').src = '';
         }
+
+        init();
     </script>
 </body>
 </html>
