@@ -3,103 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CINE RED | Stream</title>
+    <title>CINE RED | Node 0.1</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Noto+Sans+Arabic:wght@400;700;900&display=swap');
-        body { background: #000; color: #fff; font-family: 'Noto Sans Arabic', sans-serif; margin: 0; overflow-x: hidden; }
-        .hero-gradient { background: linear-gradient(0deg, #000 10%, rgba(0,0,0,0.6) 50%, transparent 100%); }
-        .card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .card:hover { transform: scale(1.05); z-index: 10; border: 2px solid #e11d48; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .glass { background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(15px); }
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@700;900&display=swap');
+        body { background: #000; color: #fff; font-family: 'Cairo', sans-serif; }
+        .hero { background: linear-gradient(0deg, #000, transparent), var(--bg); background-size: cover; background-position: center; }
+        .card { transition: 0.3s; cursor: pointer; border-radius: 12px; overflow: hidden; position: relative; }
+        .card:hover { transform: scale(1.08); box-shadow: 0 0 20px #e11d48; z-index: 10; }
+        .shimmer { background: linear-gradient(90deg, #111 25%, #222 50%, #111 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
     </style>
 </head>
 <body>
 
-    <div id="hero" class="relative h-[70vh] w-full flex items-end p-8 bg-cover bg-center transition-all duration-1000">
-        <div class="absolute inset-0 hero-gradient"></div>
-        <div class="relative z-10 max-w-2xl">
-            <h1 id="hero-title" class="text-4xl md:text-6xl font-black mb-4 uppercase tracking-tighter"></h1>
-            <p id="hero-desc" class="text-sm md:text-base text-gray-300 line-clamp-3 mb-6"></p>
-            <button id="hero-play" class="bg-white text-black px-8 py-3 rounded font-bold hover:bg-red-600 hover:text-white transition-colors">▶ تشغيل الآن</button>
+    <div id="hero" class="hero h-[60vh] flex items-end p-6 mb-8 transition-all duration-700">
+        <div class="max-w-2xl">
+            <h1 id="h-t" class="text-5xl font-black mb-4 uppercase">...</h1>
+            <p id="h-d" class="text-gray-400 line-clamp-3 mb-6"></p>
+            <button id="h-p" class="bg-red-600 px-8 py-3 rounded-lg font-bold">▶ شاهد الآن</button>
         </div>
     </div>
 
-    <main class="relative z-20 -mt-20 px-4 md:px-8">
-        
-        <div class="mb-12 max-w-md mx-auto">
-            <input type="text" id="search" oninput="doSearch()" placeholder="ابحث عن الأفلام أو المسلسلات..." 
-                   class="w-full bg-zinc-900/80 border border-white/10 p-4 rounded-lg text-center outline-none focus:border-red-600 transition-all">
+    <div class="px-6">
+        <div class="mb-10">
+            <input type="text" id="s" oninput="search()" placeholder="ابحث عن أي فيلم في العالم..." 
+                   class="w-full bg-zinc-900 border-0 p-4 rounded-xl text-center focus:ring-2 focus:ring-red-600 outline-none">
         </div>
 
-        <section id="trending-sec">
-            <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
-                <span class="w-2 h-6 bg-red-600"></span> الشائع الآن
-            </h2>
-            <div id="results" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-4">
-                </div>
-        </section>
-    </main>
-
-    <div id="player-modal" class="fixed inset-0 z-[100] bg-black hidden flex-col">
-        <div class="glass p-4 flex justify-between items-center border-b border-white/10">
-            <span id="playing-title" class="font-bold text-red-500"></span>
-            <button onclick="closePlayer()" class="text-3xl">&times;</button>
+        <h2 class="text-xl font-bold mb-6 border-r-4 border-red-600 pr-3">المحتوى الرائج</h2>
+        <div id="r" class="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <div class="shimmer aspect-[2/3] rounded-xl"></div>
+            <div class="shimmer aspect-[2/3] rounded-xl"></div>
+            <div class="shimmer aspect-[2/3] rounded-xl"></div>
+            <div class="shimmer aspect-[2/3] rounded-xl"></div>
         </div>
-        <iframe id="video-frame" class="w-full h-full border-0" allowfullscreen></iframe>
+    </div>
+
+    <div id="m" class="fixed inset-0 z-[100] bg-black hidden flex-col">
+        <div class="p-4 flex justify-between items-center bg-zinc-950">
+            <span id="m-t" class="font-bold text-red-500"></span>
+            <button onclick="closeM()" class="text-3xl">&times;</button>
+        </div>
+        <iframe id="f" class="w-full h-full" allowfullscreen></iframe>
     </div>
 
     <script>
-        const API_KEY = '840134f728c3a9d9e68e0e7a1262d495';
-        const BASE_IMG = 'https://image.tmdb.org/t/p/original';
-        const POSTER_IMG = 'https://image.tmdb.org/t/p/w500';
+        const API = '840134f728c3a9d9e68e0e7a1262d495';
+        const IMG = 'https://image.tmdb.org/t/p/w500';
+        const HD = 'https://image.tmdb.org/t/p/original';
 
         async function init() {
-            const r = await fetch(`https://api.themoviedb.org/3/trending/all/week?api_key=${API_KEY}&language=ar-SA`);
-            const d = await r.json();
-            render(d.results);
-            setHero(d.results[0]);
+            try {
+                const res = await fetch(`https://api.themoviedb.org/3/trending/all/day?api_key=${API}&language=ar-SA`);
+                const data = await res.json();
+                render(data.results);
+                setupHero(data.results[0]);
+            } catch (e) { console.error("Exploit Failed: Check connection"); }
         }
 
-        function setHero(m) {
-            document.getElementById('hero').style.backgroundImage = `url('${BASE_IMG + m.backdrop_path}')`;
-            document.getElementById('hero-title').innerText = m.title || m.name;
-            document.getElementById('hero-desc').innerText = m.overview;
-            document.getElementById('hero-play').onclick = () => play(m.id, m.media_type, m.title || m.name);
+        function setupHero(m) {
+            document.getElementById('hero').style.setProperty('--bg', `url('${HD + m.backdrop_path}')`);
+            document.getElementById('h-t').innerText = m.title || m.name;
+            document.getElementById('h-d').innerText = m.overview;
+            document.getElementById('h-p').onclick = () => play(m.id, m.media_type, m.title || m.name);
         }
 
-        function render(data) {
-            const container = document.getElementById('results');
-            container.innerHTML = data.map(m => `
-                <div onclick="play('${m.id}', '${m.media_type}', '${(m.title || m.name).replace(/'/g, "")}')" 
-                     class="card group cursor-pointer bg-zinc-900 rounded-md overflow-hidden relative">
-                    <img src="${m.poster_path ? POSTER_IMG+m.poster_path : ''}" class="w-full h-full object-cover">
-                    <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                        <span class="text-white font-bold">▶ شاهد</span>
-                    </div>
+        function render(list) {
+            document.getElementById('r').innerHTML = list.map(m => `
+                <div class="card" onclick="play('${m.id}', '${m.media_type}', '${(m.title || m.name).replace(/'/g, "")}')">
+                    <img src="${m.poster_path ? IMG+m.poster_path : 'https://via.placeholder.com/500x750'}" class="w-full h-full object-cover">
                 </div>
             `).join('');
         }
 
-        async function doSearch() {
-            const q = document.getElementById('search').value;
-            if(q.length < 2) { init(); return; }
-            const r = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${q}&language=ar-SA`);
-            const d = await r.json();
+        async function search() {
+            const val = document.getElementById('s').value;
+            if(val.length < 3) return;
+            const res = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${API}&query=${val}&language=ar-SA`);
+            const d = await res.json();
             render(d.results);
         }
 
         function play(id, type, name) {
             const t = type === 'tv' ? 'tv' : 'movie';
-            document.getElementById('video-frame').src = `https://vidsrc.me/embed/${t}?tmdb=${id}`;
-            document.getElementById('playing-title').innerText = name;
-            document.getElementById('player-modal').classList.replace('hidden', 'flex');
+            document.getElementById('f').src = `https://vidsrc.me/embed/${t}?tmdb=${id}`;
+            document.getElementById('m-t').innerText = name;
+            document.getElementById('m').classList.replace('hidden', 'flex');
         }
 
-        function closePlayer() {
-            document.getElementById('player-modal').classList.replace('flex', 'hidden');
-            document.getElementById('video-frame').src = '';
+        function closeM() {
+            document.getElementById('m').classList.replace('flex', 'hidden');
+            document.getElementById('f').src = '';
         }
 
         init();
