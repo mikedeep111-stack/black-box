@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CINE RED | Node 0.1</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@700;900&display=swap');
+        body { background: #000; color: #fff; font-family: 'Cairo', sans-serif; }
+        .hero { background: linear-gradient(0deg, #000, transparent), var(--bg); background-size: cover; background-position: center; }
+        .card { transition: 0.3s; cursor: pointer; border-radius: 12px; overflow: hidden; position: relative; }
+        .card:hover { transform: scale(1.08); box-shadow: 0 0 20px #e11d48; z-index: 10; }
+        .shimmer { background: linear-gradient(90deg, #111 25%, #222 50%, #111 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    </style>
+</head>
+<body>
+
+    <div id="hero" class="hero h-[60vh] flex items-end p-6 mb-8 transition-all duration-700">
+        <div class="max-w-2xl">
+            <h1 id="h-t" class="text-5xl font-black mb-4 uppercase">...</h1>
+            <p id="h-d" class="text-gray-400 line-clamp-3 mb-6"></p>
+            <button id="h-p" class="bg-red-600 px-8 py-3 rounded-lg font-bold">▶ شاهد الآن</button>
+        </div>
+    </div>
+
+    <div class="px-6">
+        <div class="mb-10">
+            <input type="text" id="s" oninput="search()" placeholder="ابحث عن أي فيلم في العالم..." 
+                   class="w-full bg-zinc-900 border-0 p-4 rounded-xl text-center focus:ring-2 focus:ring-red-600 outline-none">
+        </div>
+
+        <h2 class="text-xl font-bold mb-6 border-r-4 border-red-600 pr-3">المحتوى الرائج</h2>
+        <div id="r" class="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <div class="shimmer aspect-[2/3] rounded-xl"></div>
+            <div class="shimmer aspect-[2/3] rounded-xl"></div>
+            <div class="shimmer aspect-[2/3] rounded-xl"></div>
+            <div class="shimmer aspect-[2/3] rounded-xl"></div>
+        </div>
+    </div>
+
+    <div id="m" class="fixed inset-0 z-[100] bg-black hidden flex-col">
+        <div class="p-4 flex justify-between items-center bg-zinc-950">
+            <span id="m-t" class="font-bold text-red-500"></span>
+            <button onclick="closeM()" class="text-3xl">&times;</button>
+        </div>
+        <iframe id="f" class="w-full h-full" allowfullscreen></iframe>
+    </div>
+
+    <script>
+        const API = '840134f728c3a9d9e68e0e7a1262d495';
+        const IMG = 'https://image.tmdb.org/t/p/w500';
+        const HD = 'https://image.tmdb.org/t/p/original';
+
+        async function init() {
+            try {
+                const res = await fetch(`https://api.themoviedb.org/3/trending/all/day?api_key=${API}&language=ar-SA`);
+                const data = await res.json();
+                render(data.results);
+                setupHero(data.results[0]);
+            } catch (e) { console.error("Exploit Failed: Check connection"); }
+        }
+
+        function setupHero(m) {
+            document.getElementById('hero').style.setProperty('--bg', `url('${HD + m.backdrop_path}')`);
+            document.getElementById('h-t').innerText = m.title || m.name;
+            document.getElementById('h-d').innerText = m.overview;
+            document.getElementById('h-p').onclick = () => play(m.id, m.media_type, m.title || m.name);
+        }
+
+        function render(list) {
+            document.getElementById('r').innerHTML = list.map(m => `
+                <div class="card" onclick="play('${m.id}', '${m.media_type}', '${(m.title || m.name).replace(/'/g, "")}')">
+                    <img src="${m.poster_path ? IMG+m.poster_path : 'https://via.placeholder.com/500x750'}" class="w-full h-full object-cover">
+                </div>
+            `).join('');
+        }
+
+        async function search() {
+            const val = document.getElementById('s').value;
+            if(val.length < 3) return;
+            const res = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${API}&query=${val}&language=ar-SA`);
+            const d = await res.json();
+            render(d.results);
+        }
+
+        function play(id, type, name) {
+            const t = type === 'tv' ? 'tv' : 'movie';
+            document.getElementById('f').src = `https://vidsrc.me/embed/${t}?tmdb=${id}`;
+            document.getElementById('m-t').innerText = name;
+            document.getElementById('m').classList.replace('hidden', 'flex');
+        }
+
+        function closeM() {
+            document.getElementById('m').classList.replace('flex', 'hidden');
+            document.getElementById('f').src = '';
+        }
+
+        init();
+    </script>
+</body>
+</html>
